@@ -2,12 +2,14 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import styles from '@/styles/Home.module.css'
-import { useState } from 'react'
+import { useEffect, useState, useRef, MutableRefObject } from 'react'
+import ScrollToBottom from "react-scroll-to-bottom";
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   const [messages, setMessages] = useState<String[]>([])
+  const messagesEndRef = useRef() as MutableRefObject<HTMLDivElement>
 
   const handleMessages = () => {
     const message = (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement).value;
@@ -15,7 +17,15 @@ export default function Home() {
       setMessages([...messages, message]);
       (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement).value = '';
     }
+    if(message === 'oi'){
+      alert('vc digitou oi')
+      
+    }
   }
+
+  useEffect(() => {
+    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   return (
     <>
@@ -28,11 +38,12 @@ export default function Home() {
       <main>
         <div className="flex flex-col h-screen border-[1rem] w-[50%] m-auto">
           <p className='text-center font-bold text-[1.1rem] bg-blue-100'>GePeTeco</p>
-          <div className="flex-grow bg-gray-100 bg-blue-50" id='screen'>
-            {messages.map((message, index) =>(
-              <div key={index}>{message}</div>
-            ))}
-          </div>
+            <div className="flex-grow bg-gray-100 bg-blue-50" id='screen' style={{overflowY: 'scroll'}}>
+              {messages.map((message, index) =>(
+                <div key={index} className='flex justify-end'><span className='flex justify-end border-[1px] inline-block w-auto p-2 rounded-full bg-gray-200 m-2'>{message}</span></div>
+              ))}
+              <div ref={messagesEndRef}/>
+            </div>
         <div className="p-4 flex bg-blue-100">
           <textarea id='message-input' className="w-full h-16 border border-gray-300 rounded-md resize-none p-2" placeholder="Type your message"></textarea>
           <button className="bg-blue-500 text-white px-4 py-2 rounded-md ml-2" onClick={handleMessages}>Send</button>
