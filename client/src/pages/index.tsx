@@ -8,18 +8,40 @@ import ScrollToBottom from "react-scroll-to-bottom";
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
-  const [messages, setMessages] = useState<String[]>([])
+  const [messages, setMessages] = useState<any>([])
   const messagesEndRef = useRef() as MutableRefObject<HTMLDivElement>
 
-  const handleMessages = () => {
-    const message = (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement).value;
-    if(message){
-      setMessages([...messages, message]);
-      (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement).value = '';
-    }
+  function generateBotResponse(message: string){
     if(message === 'oi'){
-      alert('vc digitou oi')
-      
+      return 'Oi, tudo bem?'
+    }else if(message === 'tudo'){
+      return 'Que bom!'
+    }else{
+      return 'Ainda não entendo o que isso quer dizer :/'
+    }
+  }
+
+  // const handleMessages = () => {
+  //   const message = (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement).value;
+  //   if(message){
+  //   setMessages((prevMessages:string[]) => [...prevMessages, message]);
+  //   const botResponse = generateBotResponse(message);
+  //   setMessages((prevMessages:string[]) => [...messages, botResponse]);
+  //     (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement).value = '';
+  //   }
+  // }
+
+  const handleMessages = () => {
+    const inputElement = (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement)
+    const messageText = inputElement.value
+    if(messageText){
+      const newMessage = { text: messageText, from: 'user'}
+      setMessages((prevMessages: string[]) => [...prevMessages, newMessage])
+      inputElement.value = ''
+
+      const botResponse = generateBotResponse(messageText)
+      const newBotMessage = { text: botResponse, from: 'bot'}
+      setMessages((prevMessages:string[]) => [...prevMessages, newBotMessage])
     }
   }
 
@@ -39,9 +61,16 @@ export default function Home() {
         <div className="flex flex-col h-screen border-[1rem] w-[50%] m-auto">
           <p className='text-center font-bold text-[1.1rem] bg-blue-100'>GePeTeco</p>
             <div className="flex-grow bg-gray-100 bg-blue-50" id='screen' style={{overflowY: 'scroll'}}>
-              {messages.map((message, index) =>(
-                <div key={index} className='flex justify-end'><span className='flex justify-end border-[1px] inline-block w-auto p-2 rounded-full bg-gray-200 m-2'>{message}</span></div>
+              {messages.map((message:string[], index: number) => (
+                <div key={index} className={`flex ${message.from === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <span className='flex border-[1px] inline-block w-auto p-2 rounded-full bg-gray-200 m-2'>
+                    {message.text}
+                  </span>
+                </div>
               ))}
+              {/* {messages.map((message:any, index:any) =>(
+              <div key={index} className='flex justify-end'><span className='flex justify-end border-[1px] inline-block w-auto p-2 rounded-full bg-gray-200 m-2'>{message}</span></div>
+              ))} */}
               <div ref={messagesEndRef}/>
             </div>
         <div className="p-4 flex bg-blue-100">
