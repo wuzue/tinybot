@@ -13,6 +13,8 @@ export default function Home() {
   const messagesEndRef = useRef() as MutableRefObject<HTMLDivElement>
   const [typing, setTyping] = useState(false)
   const inputElementRef = useRef() as MutableRefObject<HTMLTextAreaElement>
+  const [joke, setJoke] = useState('')
+  const jokeElementRef = useRef() as MutableRefObject<HTMLDivElement>
 
   //pre-made bot response
   function generateBotResponse(message: string){
@@ -39,17 +41,30 @@ export default function Home() {
       setMessages((prevMessages:any[]) => [...prevMessages, newBotMessage])
       }
       inputElement.focus()
-    }
+  }
 
-    //set focus on the textarea by default - when starting the app.
-    useEffect(() => {
-      inputElementRef.current.focus()
-    }, [])
+  //set focus on the textarea by default - when starting the app.
+  useEffect(() => {
+    inputElementRef.current.focus()
+  }, [])
     
-    //scroll view as text scrolls down
-    useEffect(() => {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
-    }, [messages])
+  //scroll view as text scrolls down
+  useEffect(() => {
+    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  useEffect(() => {
+    fetch('http://localhost:5072/api/jokes')
+    .then(response => response.json())
+    .then(data => setJoke(data.value))
+    .catch(error => console.error(error))
+  }, [])
+
+  useEffect(() => {
+    if(jokeElementRef.current){
+      jokeElementRef.current.textContent = joke
+    }
+  }, [joke])
 
   return (
     <>
@@ -62,7 +77,8 @@ export default function Home() {
       <main className='bg-[#343541]'>
         <div className="flex flex-col h-screen w-[50%] m-auto">
           {/* <p className='text-center font-bold text-[1.1rem] bg-[#343541] text-[ghostwhite]'>GePeTeco</p> */}
-            <div className="flex-grow bg-[#343541]" id='screen' style={{overflowY: 'scroll'}}> 
+            <div className="flex-grow bg-[#343541]" id='screen' style={{overflowY: 'scroll'}}>
+              <div ref={jokeElementRef}></div> 
               {messages.map((message:any, index: number) => (
                 <div key={index} className={`flex ${message.from === 'user' ? 'justify-end bg-[#343541]' : 'justify-start bg-[#444654]'}`}>
                   <span className='flex h-[3rem] inline-block w-auto p-2 rounded-full text-[ghostwhite] m-2'>
