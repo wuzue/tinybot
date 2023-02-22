@@ -24,3 +24,5 @@ C:\Users\Renan\Desktop\gepeteco\server\obj\Debug\net7.0\refint\server.dll
 C:\Users\Renan\Desktop\gepeteco\server\obj\Debug\net7.0\server.pdb
 C:\Users\Renan\Desktop\gepeteco\server\obj\Debug\net7.0\server.genruntimeconfig.cache
 C:\Users\Renan\Desktop\gepeteco\server\obj\Debug\net7.0\ref\server.dll
+C:\Users\Renan\Desktop\gepeteco\server\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Users\Renan\Desktop\gepeteco\server\obj\Debug\net7.0\server.csproj.CopyComplete

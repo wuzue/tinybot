@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "em6G9iqgPUrnhunyYgoYvyOMX3DGiZgxacOf4CM5yoOn2gtbVbFGoXHSAXSLBvXtssjXXMZLd4974bzXvZZynA==",
+  "dgSpecHash": "sRHubxMqaOvhrW9EZ71GS57W36DFI7yYk5D112oltdD2OHTvNu3gLvzAW0pkq15NodsEQGRWNqU5fGnlgfVc6g==",
   "success": true,
   "projectFilePath": "C:\\Users\\Renan\\Desktop\\gepeteco\\server\\server.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Renan\\.nuget\\packages\\newtonsoft.json\\13.0.2\\newtonsoft.json.13.0.2.nupkg.sha512"
+  ],
   "logs": []
 }

@@ -4,6 +4,7 @@ import { Inter } from '@next/font/google'
 import styles from '@/styles/Home.module.css'
 import { useEffect, useState, useRef, MutableRefObject } from 'react'
 import ScrollToBottom from "react-scroll-to-bottom";
+import { request } from 'http'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,8 +14,6 @@ export default function Home() {
   const messagesEndRef = useRef() as MutableRefObject<HTMLDivElement>
   const [typing, setTyping] = useState(false)
   const inputElementRef = useRef() as MutableRefObject<HTMLTextAreaElement>
-  const [joke, setJoke] = useState('')
-  const jokeElementRef = useRef() as MutableRefObject<HTMLDivElement>
 
   //pre-made bot response
   function generateBotResponse(message: string){
@@ -24,7 +23,7 @@ export default function Home() {
     }else if(message === 'tudo'){
       return 'Que bom!'
     }else{
-      return 'Ainda não entendo o que isso quer dizer :/'
+      return `Ainda não sei o que isso quer dizer`
     }
   }
 
@@ -53,19 +52,6 @@ export default function Home() {
     messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  useEffect(() => {
-    fetch('http://localhost:5072/api/jokes')
-    .then(response => response.json())
-    .then(data => setJoke(data.value))
-    .catch(error => console.error(error))
-  }, [])
-
-  useEffect(() => {
-    if(jokeElementRef.current){
-      jokeElementRef.current.textContent = joke
-    }
-  }, [joke])
-
   return (
     <>
       <Head>
@@ -78,7 +64,8 @@ export default function Home() {
         <div className="flex flex-col h-screen w-[50%] m-auto">
           {/* <p className='text-center font-bold text-[1.1rem] bg-[#343541] text-[ghostwhite]'>GePeTeco</p> */}
             <div className="flex-grow bg-[#343541]" id='screen' style={{overflowY: 'scroll'}}>
-              <div ref={jokeElementRef}></div> 
+              {/* <div ref={jokeElementRef}></div>  */}
+              {/* {joke && <div><span ref={jokeElementRef}>{joke}</span></div>} */}
               {messages.map((message:any, index: number) => (
                 <div key={index} className={`flex ${message.from === 'user' ? 'justify-end bg-[#343541]' : 'justify-start bg-[#444654]'}`}>
                   <span className='flex h-[3rem] inline-block w-auto p-2 rounded-full text-[ghostwhite] m-2'>

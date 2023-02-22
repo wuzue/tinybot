@@ -1,32 +1,49 @@
+using System;
 using System.Net.Http;
-using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 
-var builder = WebApplication.CreateBuilder(args);
+namespace YourNamespace
+{
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-//add cors services
-builder.Services.AddCors();
+            builder.Services.AddHttpClient();
 
-var app = builder.Build();
+            var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+            app.MapGet("/weather", async context =>
+            {
+                var cityName = context.Request.Query["message"];
 
-app.MapGet("/api/jokes", async context => {
-  using var httpClient = new HttpClient();
-  var response = await httpClient.GetAsync("https://api.chucknorris.io/jokes/random");
-  response.EnsureSuccessStatusCode();
-  var content = await response.Content.ReadAsStringAsync();
-  var joke = JsonSerializer.Deserialize<Joke>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-  await context.Response.WriteAsJsonAsync(joke);
-});
+                if (!string.IsNullOrEmpty(cityName))
+                {
+                    var httpClient = context.RequestServices.GetService<HttpClient>();
+                    var url = $"http://api.weatherapi.com/v1/current.json?key=aa2bd92bba6f4e0c9bb103249232202&q={cityName}&aqi=no";
+                    var response = await httpClient.GetAsync(url);
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    dynamic weatherData = JsonConvert.DeserializeObject(responseContent);
+                    var regionName = weatherData.location.region;
+                    var getCountry = weatherData.location.country;
+                    var temperature = weatherData.current.temp_c;
 
-//enable cors
-app.UseCors(builder => builder
-  .AllowAnyOrigin()
-  .AllowAnyMethod()
-  .AllowAnyHeader());
+                    await context.Response.WriteAsync($"The temperature in {cityName} - {regionName}, {getCountry} is {temperature}°C.");
+                }
+                else
+                {
+                    await context.Response.WriteAsync("Please provide a valid message.");
+                }
+            });
 
-app.Run();
-
-public class Joke{
-  public string value { get; set; }
+            await app.RunAsync();
+        }
+    }
 }
