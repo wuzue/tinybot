@@ -26,3 +26,5 @@ C:\Users\Renan\Desktop\gepeteco\server\obj\Debug\net7.0\server.genruntimeconfig.
 C:\Users\Renan\Desktop\gepeteco\server\obj\Debug\net7.0\ref\server.dll
 C:\Users\Renan\Desktop\gepeteco\server\bin\Debug\net7.0\Newtonsoft.Json.dll
 C:\Users\Renan\Desktop\gepeteco\server\obj\Debug\net7.0\server.csproj.CopyComplete
+C:\Users\Renan\Desktop\gepeteco\server\bin\Debug\net7.0\DotNetEnv.dll
+C:\Users\Renan\Desktop\gepeteco\server\bin\Debug\net7.0\Sprache.dll

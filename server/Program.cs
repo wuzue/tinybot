@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System.Net.Http;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using DotNetEnv;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,8 +35,9 @@ app.MapGet("/weather", async context =>
 
     if (!string.IsNullOrEmpty(cityName))
     {
+        var apiKey = Environment.GetEnvironmentVariable("APIKEY");
         var httpClient = context.RequestServices.GetService<HttpClient>();
-        var url = $"http://api.weatherapi.com/v1/current.json?key=API&q={cityName}&aqi=no";
+        var url = $"http://api.weatherapi.com/v1/current.json?key={apiKey}&q={cityName}&aqi=no";
         var response = await httpClient.GetAsync(url);
         var responseContent = await response.Content.ReadAsStringAsync();
         dynamic weatherData = JsonConvert.DeserializeObject(responseContent);
