@@ -78,19 +78,40 @@ export default function Home() {
   // }
 
    //handles the message exchange system, checks whose turn it is...
+  // const handleMessages = async () => {
+  //   const inputElement = (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement)
+  //   const messageText = inputElement.value.trim()
+  //   if(messageText){
+  //     const newMessage = { text: messageText, from: 'user'}
+  //     setMessages((prevMessages: any[]) => [...prevMessages, newMessage])
+  //     inputElement.value = ''
+  //     await generateBotResponse(messageText);
+  //     const newBotMessage = { text: botResponse, from: 'bot'}
+  //     setMessages((prevMessages:any[]) => [...prevMessages, newBotMessage])
+  //   }
+  //   inputElement.focus()
+  // }
+
+  //handles the message exchange system, checks whose turn it is...
   const handleMessages = async () => {
-    const inputElement = (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement)
-    const messageText = inputElement.value.trim()
-    if(messageText){
-      const newMessage = { text: messageText, from: 'user'}
-      setMessages((prevMessages: any[]) => [...prevMessages, newMessage])
-      inputElement.value = ''
-      await generateBotResponse(messageText);
-      const newBotMessage = { text: botResponse, from: 'bot'}
-      setMessages((prevMessages:any[]) => [...prevMessages, newBotMessage])
-    }
-    inputElement.focus()
+  const inputElement = (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement)
+  const messageText = inputElement.value.trim()
+  if(messageText){
+    const newMessage = { text: messageText, from: 'user'}
+    setMessages((prevMessages: any[]) => [...prevMessages, newMessage])
+    inputElement.value = ''
+    await generateBotResponse(messageText);
   }
+  inputElement.focus()
+}
+
+  //update messages with new bot response when botResponse state changes
+  useEffect(() => {
+  if (botResponse) {
+    const newBotMessage = { text: botResponse, from: 'bot'}
+    setMessages((prevMessages:any[]) => [...prevMessages, newBotMessage])
+  }
+  }, [botResponse])
 
   //set focus on the textarea by default - when starting the app.
   useEffect(() => {
