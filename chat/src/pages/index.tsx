@@ -17,12 +17,10 @@ export default function Home() {
   const [botResponse, setBotResponse] = useState('');
   const [isGeneratingBotResponse, setIsGeneratingBotResponse] = useState(false);
 
-  //pre-made bot response
+  // THIS IS THE FUNCTION PRIOR TO USING FLASK
   // async function generateBotResponse(message: string){
-  //   setTyping(true)
-
+  //   setIsGeneratingBotResponse(true);
   //   const endPointUrl = "http://localhost:5072/weather";
-
   //   const locationMatch = message.match(/temperature in (.+)/i);
   //   if(locationMatch && locationMatch[1]){
   //     const location = locationMatch[1];
@@ -30,67 +28,39 @@ export default function Home() {
   //     try{
   //       const response = await fetch(apiUrl);
   //       const data = await response.text();
-  //       return data;
+  //       setBotResponse(data);
   //     }catch(error){
   //       console.log(`Error calling weather api, ${error}`);
-  //       return `I am sorry, there was an error retrieving that information for you.`;
+  //       setBotResponse(`I am sorry, there was an error retrieving that information for you.`);
   //     }
+  //   } else {
+  //     setBotResponse(`I am sorry, I don't know what you mean by ${message}`);
   //   }
-  //   return `I am sorry, I don't know what you mean by ${message}`;
+  //   setIsGeneratingBotResponse(false);
   // }
 
   async function generateBotResponse(message: string){
     setIsGeneratingBotResponse(true);
-
-    const endPointUrl = "http://localhost:5072/weather";
-
-    const locationMatch = message.match(/temperature in (.+)/i);
-    if(locationMatch && locationMatch[1]){
-      const location = locationMatch[1];
-      const apiUrl = `${endPointUrl}?message=${location}`;
-      try{
-        const response = await fetch(apiUrl);
-        const data = await response.text();
-        setBotResponse(data);
-      }catch(error){
-        console.log(`Error calling weather api, ${error}`);
-        setBotResponse(`I am sorry, there was an error retrieving that information for you.`);
-      }
-    } else {
-      setBotResponse(`I am sorry, I don't know what you mean by ${message}`);
+  
+    const apiUrl = "http://localhost:5000/process_message";
+  
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    };
+    try{
+      const response = await fetch(apiUrl, requestOptions);
+      const data = await response.text();
+      console.log('response data:', data);
+      console.log('response status:', response.status);
+      setBotResponse(data);
+    }catch(error){
+      console.log(`Error calling API, ${error}`);
+      setBotResponse(`I am sorry, there was an error retrieving that information for you.`);
     }
     setIsGeneratingBotResponse(false);
-  }
-
-  //handles the message exchange system, checks whose turn it is...
-  // const handleMessages = () => {
-  //   const inputElement = (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement)
-  //   const messageText = inputElement.value.trim()
-  //   if(messageText){
-  //     const newMessage = { text: messageText, from: 'user'}
-  //     setMessages((prevMessages: any[]) => [...prevMessages, newMessage])
-  //     inputElement.value = ''
-  //     const botResponse = generateBotResponse(messageText)
-  //     const newBotMessage = { text: botResponse, from: 'bot'}
-  //     setMessages((prevMessages:any[]) => [...prevMessages, newBotMessage])
-  //     }
-  //     inputElement.focus()
-  // }
-
-   //handles the message exchange system, checks whose turn it is...
-  // const handleMessages = async () => {
-  //   const inputElement = (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement)
-  //   const messageText = inputElement.value.trim()
-  //   if(messageText){
-  //     const newMessage = { text: messageText, from: 'user'}
-  //     setMessages((prevMessages: any[]) => [...prevMessages, newMessage])
-  //     inputElement.value = ''
-  //     await generateBotResponse(messageText);
-  //     const newBotMessage = { text: botResponse, from: 'bot'}
-  //     setMessages((prevMessages:any[]) => [...prevMessages, newBotMessage])
-  //   }
-  //   inputElement.focus()
-  // }
+  } 
 
   //handles the message exchange system, checks whose turn it is...
   const handleMessages = async () => {
@@ -133,11 +103,7 @@ export default function Home() {
       </Head>
       <main className='bg-[#343541]'>
         <div className="flex flex-col h-screen w-[50%] m-auto">
-          {/* <p className='text-center font-bold text-[1.1rem] bg-[#343541] text-[ghostwhite]'>GePeTeco</p> */}
             <div className="flex-grow bg-[#343541]" id='screen' style={{overflowY: 'scroll'}}>
-              {/* <div ref={jokeElementRef}></div>  */}
-              {/* {joke && <div><span ref={jokeElementRef}>{joke}</span></div>} */}
-              
               {messages.map((message:any, index: number) => (
                 <div key={index} className={`flex ${message.from === 'user' ? 'justify-end bg-[#343541]' : 'justify-start bg-[#444654]'}`}>
                   <span className='flex h-[3rem] inline-block w-auto p-2 rounded-full text-[ghostwhite] m-2'>
@@ -146,7 +112,6 @@ export default function Home() {
                 </div>
               ))}
               <div ref={messagesEndRef}/>
-
             </div>
           <div className="p-4 flex bg-[#444654] rounded-[5px] mt-[1rem]">
           <textarea onKeyDown={(e) => { if(e.key === 'Enter'){ e.preventDefault(); handleMessages()}}} ref={inputElementRef} id='message-input' className="text-[ghostwhite] w-full h-16 border border-gray-300 bg-[#444654] rounded-md resize-none p-2" placeholder="Type your message"></textarea>
