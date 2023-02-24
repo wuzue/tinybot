@@ -41,26 +41,25 @@ export default function Home() {
 
   async function generateBotResponse(message: string){
     setIsGeneratingBotResponse(true);
-  
-    const apiUrl = "http://localhost:5000/process_message";
-  
+    const endPointUrl = "http://127.0.0.1:5000/";
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ "message": message })
     };
-    try{
-      const response = await fetch(apiUrl, requestOptions);
+    try {
+      const response = await fetch(endPointUrl, requestOptions);
+      console.log('sent post request to flask');
+      
       const data = await response.text();
-      console.log('response data:', data);
-      console.log('response status:', response.status);
       setBotResponse(data);
-    }catch(error){
+    } catch (error) {
       console.log(`Error calling API, ${error}`);
       setBotResponse(`I am sorry, there was an error retrieving that information for you.`);
     }
     setIsGeneratingBotResponse(false);
-  } 
+    setBotResponse(`I don't know what you mean by ${message}`);
+}
 
   //handles the message exchange system, checks whose turn it is...
   const handleMessages = async () => {
