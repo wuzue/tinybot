@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import spacy
 
@@ -18,9 +18,15 @@ def home():
     text = msg
     # change here depending on the language you want to process
     doc = modelEN(text)
+    # tokens = []
+    output_str = ""
     for token in doc:
-      print(token.text, token.pos_)
-    return ''
+      # tokens.append({"text": token.text, 'pos': token.pos_})
+      output_str += f"{token.text} {token.pos_}"
+    # print(output_str)
+      # print(token.text, token.pos_)
+    # return jsonify(tokens)
+    return output_str
 
 if __name__ == '__main__':
     print('starting flask')
