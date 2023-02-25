@@ -50,17 +50,16 @@ export default function Home() {
     try {
       const response = await fetch(endPointUrl, requestOptions);
       console.log('sent post request to flask');
-      
       const data = await response.text();
-      setBotResponse(data);
+      const styledResponse = data
+      setBotResponse(styledResponse)
+      // setBotResponse(`Processed message:\n${data}`);
     } catch (error) {
       console.log(`Error calling API, ${error}`);
       setBotResponse(`I am sorry, there was an error retrieving that information for you.`);
     }
     setIsGeneratingBotResponse(false);
-    setBotResponse(`I don't know what you mean by ${message}`);
-}
-
+  }
   //handles the message exchange system, checks whose turn it is...
   const handleMessages = async () => {
   const inputElement = (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement)
