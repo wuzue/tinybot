@@ -41,7 +41,7 @@ export default function Home() {
 
   async function generateBotResponse(message: string){
     setIsGeneratingBotResponse(true);
-    const endPointUrl = "http://127.0.0.1:5000/";
+    const endPointUrl = "http://127.0.0.1:5072/api/messages";
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -49,7 +49,7 @@ export default function Home() {
     };
     try {
       const response = await fetch(endPointUrl, requestOptions);
-      console.log('sent post request to flask');
+      console.log('sent post request to C# server');
       const data = await response.text();
       const styledResponse = data
       setBotResponse(styledResponse)
@@ -59,7 +59,8 @@ export default function Home() {
       setBotResponse(`I am sorry, there was an error retrieving that information for you.`);
     }
     setIsGeneratingBotResponse(false);
-  }
+  } 
+
   //handles the message exchange system, checks whose turn it is...
   const handleMessages = async () => {
   const inputElement = (document.getElementById('message-input') as HTMLInputElement | HTMLTextAreaElement)

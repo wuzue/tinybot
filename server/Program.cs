@@ -5,6 +5,9 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using DotNetEnv;
+using System.Threading.Tasks;
+using System.Text;
+using Newtonsoft.Json.Linq;
 
 Env.Load();
 
@@ -29,27 +32,18 @@ var app = builder.Build();
 // Enable CORS for the "/weather" endpoint
 app.UseCors("CorsPolicy");
 
-app.MapGet("/weather", async context =>
-{
-    var cityName = context.Request.Query["message"];
+app.MapPost("/api/messages", async (HttpContext context) =>{
+    string requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+    var message = JObject.Parse(requestBody)["message"].ToString();
 
-    if (!string.IsNullOrEmpty(cityName))
+    using (var client = new HttpClient())
     {
-        var apiKey = Environment.GetEnvironmentVariable("APIKEY");
-        var httpClient = context.RequestServices.GetService<HttpClient>();
-        var url = $"http://api.weatherapi.com/v1/current.json?key={apiKey}&q={cityName}&aqi=no";
-        var response = await httpClient.GetAsync(url);
-        var responseContent = await response.Content.ReadAsStringAsync();
-        dynamic weatherData = JsonConvert.DeserializeObject(responseContent);
-        var regionName = weatherData.location.region;
-        var getCountry = weatherData.location.country;
-        var temperature = weatherData.current.temp_c;
+        var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5000/process-message");
+        request.Content = new StringContent(JsonConvert.SerializeObject(new { message }), Encoding.UTF8, "application/json");
 
-        await context.Response.WriteAsync($"The temperature in {cityName} - {regionName}, {getCountry} is {temperature}°C.");
-    }
-    else
-    {
-        await context.Response.WriteAsync("Please provide a valid message.");
+        var response = await client.SendAsync(request);
+        var responseData = await response.Content.ReadAsStringAsync();
+        return Results.Ok(new { response = responseData });
     }
 });
 
