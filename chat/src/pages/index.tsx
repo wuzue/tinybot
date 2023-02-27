@@ -105,7 +105,7 @@ export default function Home() {
             <div className="flex-grow bg-[#343541]" id='screen' style={{overflowY: 'scroll'}}>
               {messages.map((message:any, index: number) => (
                 <div key={index} className={`flex ${message.from === 'user' ? 'justify-end bg-[#343541]' : 'justify-start bg-[#444654]'}`}>
-                  <span className='flex h-[3rem] inline-block w-auto p-2 rounded-full text-[ghostwhite] m-2'>
+                  <span className='flex h-[3rem] inline-block w-auto p-2 rounded-full text-[ghostwhite] m-2 'style={{whiteSpace: 'pre-wrap'}}>
                     {message.text}
                   </span>
                 </div>

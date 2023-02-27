@@ -2,12 +2,13 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import random
 import spacy
+from duckduckgo_search import ddg
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 greetings = ['hi', 'hello', 'hey', 'yo', 'greetings', 'heya', "what's up", 'what up', 'wassup'] # greeting words, add more if necessary
-request_verbs = ['find', 'get', 'show', 'tell', 'give'] # verbs that indicate a request for information, add more if necessary
+request_verbs = ['search'] # verbs that indicate a request for information, add more if necessary
 small_talk = {
   "greetings": ["Hello!", "Hi there!", "Hey! How can I assist you today?", "Howdy!", "Hey!"], # response for greetings, add more if necessary
   "bot_info": ["I'm a chatbot designed to assist you with information. What can I help you with?"],
@@ -34,11 +35,9 @@ def process_message():
 
   # check for request information
   # THIS IS KINDA WEIRD, NOT WORKING PROPERLY, CANT DETECT TWO WORDS OF CONTENT E.G. BURGER KING, ONLY DETECTS KING.
-  for token in doc:
-    if token.text in request_verbs:
-      intent = 'request_information'
-      break
-    elif token.pos_ == 'VERB' and token.dep_ == 'ROOT' and token.text != 'be':
+  for i, token in enumerate(doc):
+    if token.text == 'search':
+      keywords = ' '.join([t.text for t in doc[i+1:]])
       intent = 'request_information'
       break
 
@@ -59,23 +58,43 @@ def process_message():
         intent = 'bot_info'
         break
 
-  # extract named entities
+  # extract named entities, extracts only first e.g. deep learning = 1
+  # for ent in doc.ents:
+  #   entity_type = ent.label_
+  #   entity_value = ent.text
+  #   break
+
+  # extract named entities, but this extracts all the word e.g. deep learning = 2
+  entities = []
   for ent in doc.ents:
     entity_type = ent.label_
     entity_value = ent.text
-    break
+    entities.append((entity_type, entity_value))
+
+  # use the first named entity for now (can be modified)
+  if entities:
+    entity_type, entity_value = entities[0]
+  else:
+    entity_type, entity_value = None, None
 
   # generate responses
   if intent == 'greetings':
     response = random.choice(small_talk['greetings'])
-  elif intent == 'request_information' and entity_type:
-    response = f"Here's the information I found on {entity_type}: {entity_value}"
+
+  elif intent == 'request_information':
+    # print(keywords)
+    result = ddg(keywords, region='wt-wt', safesearch='Off', max_results=1, time='y')
+    response = f"I found this link for {keywords}:\n\n {result[0]['title']}\n\n {result[0]['body']}\n\nAnd here's the link for this result:\n{result[0]['href']}"
+
   elif intent == 'customer_support':
     response = "I'm sorry to hear that. Please provide more details about your problem or issue."
+
   elif intent == 'thanks':
     response = random.choice(small_talk['thanks'])
+
   elif intent == 'bot_info':
     response = random.choice(small_talk['bot_info'])
+
   else:
     response = "I am sorry, I did not understand your request."
 
