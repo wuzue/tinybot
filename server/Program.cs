@@ -43,7 +43,8 @@ app.MapPost("/api/messages", async (HttpContext context) =>{
 
         var response = await client.SendAsync(request);
         var responseData = await response.Content.ReadAsStringAsync();
-        return Results.Ok(new { response = responseData });
+        // return Results.Ok(new { response = responseData }); // this returns text wrapped in json
+        return responseData; //this returns only the text
     }
 });
 
