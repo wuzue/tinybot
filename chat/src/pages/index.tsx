@@ -104,8 +104,9 @@ export default function Home() {
         <div className="flex flex-col h-screen w-[50%] m-auto">
             <div className="flex-grow bg-[#343541]" id='screen' style={{overflowY: 'scroll'}}>
               {messages.map((message:any, index: number) => (
-                <div key={index} className={`flex ${message.from === 'user' ? 'justify-end bg-[#343541]' : 'justify-start bg-[#444654]'}`}>
-                  <span className='flex h-[3rem] inline-block w-auto p-2 rounded-full text-[ghostwhite] m-2 'style={{whiteSpace: 'pre-wrap'}}>
+                // <div key={index} className={`flex ${message.from === 'user' ? 'justify-end bg-[#343541]' : 'justify-start bg-[#444654]'}`}>
+                <div key={index}>
+                  <span className={`flex h-[3rem] inline-block w-[100%] h-auto p-2 text-[ghostwhite] ${message.from === 'user' ? 'justify-end bg[#343541]' : 'justify-start bg-[#444654]'}`} style={{whiteSpace: 'pre-wrap'}}>
                     {message.text}
                   </span>
                 </div>

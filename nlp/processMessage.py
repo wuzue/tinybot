@@ -16,6 +16,9 @@ small_talk = {
   # Add more small talk phrases and responses as needed
 }
 
+# TO DO: STYLE THE ANSWER OF THE SEARCH ENGINE > search machine learning
+# STYLE LINK, TITLE AND BODY OF RESULT
+
 modelEN = spacy.load("en_core_web_sm") #english model
 
 @app.route('/process-message', methods=['GET','POST'])
@@ -39,8 +42,12 @@ def process_message():
     if token.text == 'search':
       keywords = ' '.join([t.text for t in doc[i+1:]])
       intent = 'request_information'
-      break
-
+  
+  # this one is to search for pdf files
+  for i, token in enumerate(doc):
+    if token.text == 'pdf':
+      keywords = ' '.join([t.text for t in doc[i+1:]]) + ':pdf'
+      intent = 'pdf_files'
 
   # check for customer support inquiries
   for token in doc:
@@ -57,12 +64,6 @@ def process_message():
       elif token.text == 'who' and token.nbor().text == 'are' and token.nbor(2).text == 'you':
         intent = 'bot_info'
         break
-
-  # extract named entities, extracts only first e.g. deep learning = 1
-  # for ent in doc.ents:
-  #   entity_type = ent.label_
-  #   entity_value = ent.text
-  #   break
 
   # extract named entities, but this extracts all the word e.g. deep learning = 2
   entities = []
@@ -83,8 +84,13 @@ def process_message():
 
   elif intent == 'request_information':
     # print(keywords)
-    result = ddg(keywords, region='wt-wt', safesearch='Off', max_results=1, time='y')
-    response = f"I found this link for {keywords}:\n\n {result[0]['title']}\n\n {result[0]['body']}\n\nAnd here's the link for this result:\n{result[0]['href']}"
+    result = ddg(keywords, region='wt-wt', safesearch='Off', max_results=2, time='y')
+    response = f"I found this results for {keywords}:\n\n {result[0]['title']}\n\n {result[0]['body']}\n\nHere you can read more about it:\n{result[0]['href']}"
+  
+  elif intent == 'pdf_files':
+    result = ddg(keywords, safesearch='Off', max_results=100)
+    extracted_keyword = keywords.split(":")[0]
+    response = f"I found this pdf for {extracted_keyword}: \n\n {result[0]['title']}\n\n {result[0]['body']}\n\nHere it is the link for it:\n{result[0]['href']}"
 
   elif intent == 'customer_support':
     response = "I'm sorry to hear that. Please provide more details about your problem or issue."
