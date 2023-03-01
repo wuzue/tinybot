@@ -2,20 +2,32 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import random
 import spacy
-from duckduckgo_search import ddg
-from duckduckgo_search import ddg_videos
+from duckduckgo_search import ddg, ddg_videos
 import requests
+# from transformers import AutoModel, AutoTokenizer
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
+"""     refer to tinygrad, and move this part to a separate file later
+model_name = 'bert-base-uncased'
+model = AutoModel.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+demo_text = 'this is a sample data'
+demo_input = tokenizer(demo_text, return_tensors='pt')
+"""
+
 greetings = ['hi', 'hello', 'hey', 'yo', 'greetings', 'heya', "what's up", 'what up', 'wassup'] # greeting words, add more if necessary
+how_are_you = ['how are you?', 'how are you', 'how are you doing?', 'how are you doing', 'how are you today?', 'how are you today', 'what is up with you?', 'what is up with you', 'whats up with you?', 'whats up with you', "what's up with you?", "what's is up with you"]
 request_verbs = ['search', 'i need', 'tell me', 'tell', 'what is', 'what', 'how to'] # verbs that indicate a request for information, add more if necessary
 request_verbs_videos = ['a video of', 'youtube video', 'video about', 'youtube video about', 'video']
 small_talk = {
   "greetings": ["Hello!", "Hi there!", "Hey! How can I assist you today?", "Howdy!", "Hey!"], # response for greetings, add more if necessary
-  "bot_info": ["I'm a chatbot designed to assist you with information. What can I help you with?"],
+  "bot_info": [""],
   "thanks": ["You're welcome!", "No problem!", "Glad to assist you!"],
+  "bot_is_doing": ["I'm doing great, thanks for asking!", "I'm feeling a bit tired today, but still ready to chat!", "I'm doing well, how about you?",    "I'm doing just fine, thanks!",    "I'm having a great day, thanks for asking!",    "I'm feeling a little under the weather, but I'm here to help!",    "I'm doing awesome today, thanks for asking!",    "I'm feeling a little overwhelmed, but I'm always here to chat with you!",    "I'm doing pretty well, thanks for asking!",    "I'm feeling fantastic today, thanks for asking!",    "I'm doing okay, how about you?",    "I'm feeling a little stressed, but I'm happy to chat with you!",    "I'm doing wonderfully today, thanks for asking!",    "I'm feeling a bit anxious today, but I'm here to help you!",    "I'm doing great, thanks for checking in!"],
+  "who_is_bot": ["I'm a chatbot designed to assist you with information. What can I help you with?", "I'm your friendly chatbot!",    "I'm an AI language model here to chat with you.",    "I'm your virtual assistant, at your service!",    "I'm a machine learning model designed to converse with humans.",    "I'm a language AI created by OpenAI.",    "I'm an intelligent chatbot designed to help you.",    "I'm a digital assistant programmed to answer your questions.",    "I'm an artificial intelligence programmed to have conversations with people.",    "I'm a computer program designed to interact with you.",    "I'm an AI language model, how can I assist you?",    "I'm a chatbot designed to help you with your inquiries.",    "I'm an automated assistant programmed to respond to your queries.",    "I'm a virtual companion, ready to chat with you!",    "I'm an intelligent assistant designed to assist you with your needs.",    "I'm a digital agent here to help with any questions or concerns you may have."],
   # Add more small talk phrases and responses as needed
 }
 
@@ -42,6 +54,12 @@ def process_message():
       intent = 'greetings'
       break
   
+  # ask bot how its doing
+  for token in doc:
+    if text in how_are_you:
+      intent = 'how_are_you_doing'
+      break
+
   #ask for crypto price
   for token in doc:
     if text.split()[0] in crypto_names and text.split()[1] == 'price':
@@ -99,7 +117,7 @@ def process_message():
       if token.text == 'thanks' or token.text == 'thank' or token.text == 'thank you':
         intent = 'thanks'
         break
-      elif token.text == 'who' and token.nbor().text == 'are' and token.nbor(2).text == 'you':
+      elif token.text == 'who' and token.nbor().text == 'are' and token.nbor(2).text == 'you' or text == 'who are you?' or text == 'who are you' or text == 'who r u' or text == 'who r u?' or text == 'who is you' or text == 'who is you?' or text == 'whos you' or text == 'whos you?':
         intent = 'bot_info'
         break
   
@@ -109,6 +127,7 @@ def process_message():
     entity_type = ent.label_
     entity_value = ent.text
     entities.append((entity_type, entity_value))
+
   # use the first named entity for now (can be modified)
   if entities:
     entity_type, entity_value = entities[0]
@@ -119,6 +138,10 @@ def process_message():
   # response for greetings
   if intent == 'greetings':
     response = random.choice(small_talk['greetings'])
+
+  # response for how are you?
+  if intent == 'how_are_you_doing':
+    response = random.choice(small_talk['bot_is_doing'])
 
   # response for searching | `search machine learning`
   elif intent == 'request_information':
@@ -147,17 +170,19 @@ def process_message():
 
   # response when asking the bot about itself
   elif intent == 'bot_info':
-    response = random.choice(small_talk['bot_info'])
+    response = random.choice(small_talk['who_is_bot'])
   
+  # response when asking for coin price | bitcoin price
   elif intent == 'crypto':
     response = f"The current price for {text.split()[0]} is: ${coin_price:.2f}."
 
+  # response when asking for crypto price wrongly
   elif intent == 'help_crypto':
     response = "Correct syntax is: coin + price. For example: bitcoin price"
 
   # response when none of the conditions above are met
   else:
-    response = "I am sorry, I did not understand your request."
+    response = "I am sorry, as a new bot, I don't understand this yet."
 
   # return jsonify({'response': response}) # this returns json
   return response
