@@ -4,6 +4,7 @@ import random
 import spacy
 from duckduckgo_search import ddg
 from duckduckgo_search import ddg_videos
+import requests
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
@@ -18,9 +19,6 @@ small_talk = {
   # Add more small talk phrases and responses as needed
 }
 
-# TO DO: STYLE THE ANSWER OF THE SEARCH ENGINE > search machine learning
-# STYLE LINK, TITLE AND BODY OF RESULT
-
 modelEN = spacy.load("en_core_web_sm") #english model
 
 @app.route('/process-message', methods=['GET','POST'])
@@ -32,12 +30,32 @@ def process_message():
   entity_type = None
   entity_value = None
 
+  #coingecko api
+  crypto_url = requests.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=90&page=1&sparkline=false")
+  crypto_list = crypto_url.json()
+  # extract name of coins
+  crypto_names = [crypto['name'].lower() for crypto in crypto_list]
+
   # check for greetings 
   for token in doc:
     if token.pos_ == 'INTJ' and token.dep_ == 'intj' or token.pos_ == 'INTJ' and token.dep_ == 'ROOT' or token.text in greetings: 
       intent = 'greetings'
       break
-
+  
+  #ask for crypto price
+  for token in doc:
+    if text.split()[0] in crypto_names and text.split()[1] == 'price':
+      coin_data = next((coin for coin in crypto_list if coin['name'].lower() == text.split()[0].lower()), None)
+      if coin_data:
+        coin_price = coin_data['current_price']
+        # response = f"The current price of {text.split()[0]} is {coin_price:.2f} USD"
+        intent = 'crypto'
+      else:
+        response = f"I am sorry, I couldn't find the price for {text.split()[0]}. Please, try another coin."
+      break
+    elif token.text in crypto_names and text.split()[0]:
+      intent = 'help_crypto'
+    
   # check for request information
   for i, token in enumerate(doc):
     if token.text in request_verbs:
@@ -84,7 +102,7 @@ def process_message():
       elif token.text == 'who' and token.nbor().text == 'are' and token.nbor(2).text == 'you':
         intent = 'bot_info'
         break
-
+  
   # extract named entities, but this extracts all the word e.g. deep learning = 2
   entities = []
   for ent in doc.ents:
@@ -117,7 +135,7 @@ def process_message():
   # response for searching for video
   elif intent == 'video_search':
     result = ddg_videos(keywords, region='wt-wt', safesearch='Off',max_results=50)
-    response = f"Here's the result for: {keywords}\n\n {result[0]['title']}\n\n {result[0]['description']}\n\nHere is the link for the video:\n{result[0]['content']}"
+    response = f"Here's a video about: {keywords}\n\n {result[0]['title']}\n\n {result[0]['description']}\n\nHere is the link for the video:\n{result[0]['content']}"
 
   # response for help
   elif intent == 'customer_support':
@@ -130,6 +148,12 @@ def process_message():
   # response when asking the bot about itself
   elif intent == 'bot_info':
     response = random.choice(small_talk['bot_info'])
+  
+  elif intent == 'crypto':
+    response = f"The current price for {text.split()[0]} is: ${coin_price:.2f}."
+
+  elif intent == 'help_crypto':
+    response = "Correct syntax is: coin + price. For example: bitcoin price"
 
   # response when none of the conditions above are met
   else:
