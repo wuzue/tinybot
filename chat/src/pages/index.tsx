@@ -106,7 +106,7 @@ export default function Home() {
               {messages.map((message:any, index: number) => (
                 // <div key={index} className={`flex ${message.from === 'user' ? 'justify-end bg-[#343541]' : 'justify-start bg-[#444654]'}`}>
                 <div key={index}>
-                  <span className={`flex h-[3rem] inline-block w-[100%] h-auto p-2 text-[ghostwhite] ${message.from === 'user' ? 'justify-end bg[#343541]' : 'justify-start bg-[#444654]'}`} style={{whiteSpace: 'pre-wrap'}}>
+                  <span className={`flex h-[3rem] inline-block w-[100%] h-auto p-2 text-[ghostwhite] mt-[.5rem] mb-[.5rem] ${message.from === 'user' ? 'justify-end bg[#343541]' : 'justify-start bg-[#444654]'}`} style={{whiteSpace: 'pre-wrap'}}>
                     {message.text}
                   </span>
                 </div>

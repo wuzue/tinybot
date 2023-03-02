@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import random
 import spacy
-from duckduckgo_search import ddg, ddg_videos
+from duckduckgo_search import ddg, ddg_videos, ddg_answers, ddg_news
 import requests
 # from transformers import AutoModel, AutoTokenizer
 
@@ -88,6 +88,15 @@ def process_message():
       intent = 'request_information'
       break
   
+  #check for news request
+  for i, token in enumerate(doc):
+    if token.text.startswith('news'):
+      keywords = ' '.join([t.text for t in doc[i+1:]])
+    elif token.text.startswith('news about'):
+      keywords = ' '.join([t.text for t in doc[i+3:]])
+    intent = 'news_request'
+    break
+  
   # this one is to search for pdf files
   for i, token in enumerate(doc):
     if token.text == 'pdf':
@@ -143,11 +152,19 @@ def process_message():
   if intent == 'how_are_you_doing':
     response = random.choice(small_talk['bot_is_doing'])
 
+  # response for news request
+  if intent == 'news_request':
+    result = ddg_news(keywords, region='wt-wt', safesearch='Off', time='d', max_results=100)
+    response = f"{result[0]['title']}\n\n {result[0]['body']}\n\n Source: {result[0]['source']}"
+
   # response for searching | `search machine learning`
   elif intent == 'request_information':
-    # print(keywords)
-    result = ddg(keywords, region='wt-wt', safesearch='Off', max_results=2, time='y')
-    response = f"I found this about {keywords}:\n\n {result[0]['title']}\n\n {result[0]['body']}\n\nHere you can read more about it:\n{result[0]['href']}"
+    #default ddg answers
+    # result = ddg(keywords, region='wt-wt', safesearch='Off', max_results=2, time='y')
+    # ddg instant answers
+    result = ddg_answers(keywords, related=True)
+    # response = f"I found this about {keywords}:\n\n {result[0]['title']}\n\n {result[0]['body']}\n\nHere you can read more about it:\n{result[0]['href']}"
+    response = f"{result[0]['text']}"
   
   # response for searching for pdf files | `pdf machine learning`
   elif intent == 'pdf_files':
