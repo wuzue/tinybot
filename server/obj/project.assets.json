@@ -4830,11 +4830,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Renan\\Desktop\\gepeteco\\server\\server.csproj",
+      "projectUniqueName": "C:\\Users\\Renan\\Desktop\\tinybot\\server\\server.csproj",
       "projectName": "server",
-      "projectPath": "C:\\Users\\Renan\\Desktop\\gepeteco\\server\\server.csproj",
+      "projectPath": "C:\\Users\\Renan\\Desktop\\tinybot\\server\\server.csproj",
       "packagesPath": "C:\\Users\\Renan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Renan\\Desktop\\gepeteco\\server\\obj\\",
+      "outputPath": "C:\\Users\\Renan\\Desktop\\tinybot\\server\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Renan\\AppData\\Roaming\\NuGet\\NuGet.Config"

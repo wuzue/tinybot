@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "O1T3wuTTy6MGPV3Y/eP0vvUzcgarNkNbWs4fXdYxoPxyT3S5L+EYVdgmRc28BYswoyTBZ4f78md1LtCL8tfbBg==",
+  "dgSpecHash": "GsMrYAGJ9FbE6ccMtV/yE3Dp5FcWjS7wbAVGUtO4UrPVcgOQAJwTcZ/qiG9hwT3pbkVT6/5g5Bz+RG5l46TC9w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Renan\\Desktop\\gepeteco\\server\\server.csproj",
+  "projectFilePath": "C:\\Users\\Renan\\Desktop\\tinybot\\server\\server.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Renan\\.nuget\\packages\\dotnetenv\\2.5.0\\dotnetenv.2.5.0.nupkg.sha512",
     "C:\\Users\\Renan\\.nuget\\packages\\microsoft.extensions.configuration\\1.1.2\\microsoft.extensions.configuration.1.1.2.nupkg.sha512",
